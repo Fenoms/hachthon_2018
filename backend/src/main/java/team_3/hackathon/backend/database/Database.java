@@ -54,15 +54,18 @@ public class Database {
 
             server = new SocketIOServer(config);
 
-            server.addEventListener("proposal", String.class, ((client, data, ackSender) -> {
+            server.addConnectListener(client->{
+                System.out.println(client.getSessionId());
+            });
+            server.addEventListener("proposal", String.class, (client, data, ackSender) -> {
                 proposalHandler(client, data);
-            }));
+            });
 
-            server.addEventListener("hope", String.class, ((client, data, ackSender) -> {
+            server.addEventListener("hope", String.class, (client, data, ackSender) -> {
                 HashMap<String, HashMap<String, String >> hope = hopeHandler(data);
                 client.sendEvent("return", hope);
 
-            }));
+            });
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -71,8 +74,8 @@ public class Database {
 
     public void start(){
         client.connect();
-        client.emit("db_hello", "");
         server.start();
+        client.emit("db_hello", "");
     }
 
     public void stop(){
@@ -101,13 +104,15 @@ public class Database {
             if(dbClient.contains(Integer.toString(i))){
                 JsonObject json = dbClient.find(JsonObject.class, Integer.toString(i));
                 HashMap<String, String> tmp = new HashMap<>();
-                tmp.put("user_id", json.get("t_userid").toString());
+                tmp.put("user_id", json.get("t_agentid").toString());
                 tmp.put("data_time", json.get("t_time").toString());
                 tmp.put("description", json.get("t_description").toString());
                 tmp.put("status", json.get("t_status").toString());
                 tmp.put("replay", json.get("t_replay").toString());
 
+
                 hope.put(Integer.toString(i), tmp);
+
             }
         }
 
@@ -141,8 +146,13 @@ public class Database {
         }
         cacheLock.writeLock().unlock();
 
+        System.out.println(toBeUpdated.size());
         if (toBeUpdated.size() > 0) {
+<<<<<<< Updated upstream
             System.out.println("database: " + toBeUpdated.size());
+=======
+            System.out.println(toBeUpdated.size());
+>>>>>>> Stashed changes
             server.getBroadcastOperations().sendEvent("order", new Gson().toJson(toBeUpdated));
 
             CouchDbProperties properties = new CouchDbProperties()
@@ -159,8 +169,21 @@ public class Database {
             for(Map.Entry<Integer, Proposal> entry: order.entrySet()){
                 if(dbClient.contains(Integer.toString(entry.getKey()))){
                     JsonObject json = dbClient.find(JsonObject.class, Integer.toString(entry.getKey()));
-                    json.addProperty("t_agentid", entry.getValue().getUserID());
-                    json.addProperty("t_status", entry.getValue().getCmd());
+
+                    if(entry.getValue().getCmd().equals("close")){
+                        json.addProperty("t_agentid", entry.getValue().getUserID());
+                        json.addProperty("t_status", entry.getValue().getCmd());
+                        json.addProperty("t_replay", entry.getValue().getReply().orElse(""));
+                    }
+                    else if(entry.getValue().getCmd().equals("process")){
+                        json.addProperty("t_agentid", entry.getValue().getUserID());
+                        json.addProperty("t_status", entry.getValue().getCmd());
+                    }
+                    else{
+                        json.addProperty("t_agentid", Integer.toString(0));
+                        json.addProperty("t_status", "open");
+                    }
+
                     dbClient.update(json);
                 }
             }
@@ -194,8 +217,11 @@ public class Database {
 
             if(accept){
                 client.sendEvent("accept", data);
+                System.out.println("accept");
             } else {
                 client.sendEvent("refuse", data);
+                System.out.println("refuse");
+
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -74,7 +74,11 @@ public class Orderer {
                     proposalList.append(proposal.getInt("ticket_id"),
                             new Proposal(proposal.getInt("user_id"),
                                     proposal.getString("cmd"),
+<<<<<<< Updated upstream
                                     Optional.ofNullable(proposal.optString("reply"))));
+=======
+                            Optional.ofNullable(proposal.optString("reply"))));
+>>>>>>> Stashed changes
 //            if (block != null){
 //                System.out.println("Orderor: " + block.toString());
 //                //timer.cancel();
