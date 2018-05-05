@@ -5,11 +5,14 @@ import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.lightcouch.CouchDbClient;
+import org.lightcouch.CouchDbProperties;
 import team_3.hackathon.backend.orderer.Proposal;
 
 import java.lang.reflect.Type;
@@ -21,9 +24,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Database {
     private HashMap<Integer, CacheInfo> cache;
-    Socket client;
-    SocketIOServer server;
-    ReentrantReadWriteLock cacheLock;
+    private Socket client;
+    private SocketIOServer server;
+    private ReentrantReadWriteLock cacheLock;
 
     public Database(){
         cache = new HashMap<>();
@@ -53,6 +56,13 @@ public class Database {
             server.addEventListener("proposal", String.class, ((client, data, ackSender) -> {
                 proposalHandler(client, data);
             }));
+
+            server.addEventListener("hope", String.class, ((client, data, ackSender) -> {
+                HashMap<String, HashMap<String, String >> hope = hopeHandler(data);
+                client.sendEvent("return", hope);
+
+            }));
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -68,6 +78,41 @@ public class Database {
         server.stop();
         client.disconnect();
     }
+
+    private HashMap<String, HashMap<String,String>> hopeHandler(String data){
+
+        CouchDbProperties properties = new CouchDbProperties()
+                .setDbName("db-ticket")
+                .setCreateDbIfNotExist(true)
+                .setProtocol("http")
+                .setHost("127.0.0.1")
+                .setPort(5984)
+                .setMaxConnections(100)
+                .setConnectionTimeout(0);
+
+        CouchDbClient dbClient = new CouchDbClient(properties);
+
+        HashMap<String, HashMap<String, String>> hope = new HashMap<>();
+        int start = Integer.parseInt(data);
+        int end = start + 10;
+        for(int i = start; i < 1000 && i < end; i++){
+
+            if(dbClient.contains(Integer.toString(i))){
+                JsonObject json = dbClient.find(JsonObject.class, Integer.toString(i));
+                HashMap<String, String> tmp = new HashMap<>();
+                tmp.put("user_id", json.get("t_userid").toString());
+                tmp.put("data_time", json.get("t_time").toString());
+                tmp.put("description", json.get("t_description").toString());
+                tmp.put("status", json.get("t_status").toString());
+                tmp.put("replay", json.get("t_replay").toString());
+
+                hope.put(Integer.toString(i), tmp);
+            }
+        }
+
+        return hope;
+    }
+
 
     private void orderHandler(String order_str){
         HashMap<Integer, Proposal> toBeUpdated = new HashMap<>();
@@ -98,7 +143,27 @@ public class Database {
         if (toBeUpdated.size() > 0) {
             server.getBroadcastOperations().sendEvent("order", new Gson().toJson(toBeUpdated));
 
-            //TODO change database state
+            CouchDbProperties properties = new CouchDbProperties()
+                    .setDbName("db-ticket")
+                    .setCreateDbIfNotExist(true)
+                    .setProtocol("http")
+                    .setHost("127.0.0.1")
+                    .setPort(5984)
+                    .setMaxConnections(100)
+                    .setConnectionTimeout(0);
+
+            CouchDbClient dbClient = new CouchDbClient(properties);
+
+            for(Map.Entry<Integer, Proposal> entry: order.entrySet()){
+                if(dbClient.contains(Integer.toString(entry.getKey()))){
+                    JsonObject json = dbClient.find(JsonObject.class, Integer.toString(entry.getKey()));
+                    json.addProperty("t_agentid", entry.getValue().getUserID());
+                    json.addProperty("t_status", entry.getValue().getCmd());
+                    dbClient.update(json);
+                }
+            }
+
+            dbClient.shutdown();
             //System.out.println(toBeUpdated);
         }
     }
