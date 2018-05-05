@@ -74,18 +74,8 @@ public class Orderer {
                     proposalList.append(proposal.getInt("ticket_id"),
                             new Proposal(proposal.getInt("user_id"),
                                     proposal.getString("cmd"),
-<<<<<<< Updated upstream
                                     Optional.ofNullable(proposal.optString("reply"))));
-=======
-                            Optional.ofNullable(proposal.optString("reply"))));
->>>>>>> Stashed changes
-//            if (block != null){
-//                System.out.println("Orderor: " + block.toString());
-//                //timer.cancel();
-//                broadcastBlock(block);
-//                //timer.purge();
-//                //restartTimer();
-//            }
+
             broadcastBlockIfThereIs(block);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -99,19 +89,6 @@ public class Orderer {
         }
     }
 
-//    private void broadcastBlock(HashMap<Integer, Proposal> block){
-//        server.getRoomOperations("database").sendEvent("order", new Gson().toJson(block));
-//    }
-
-//    private void restartTimer(){
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                broadcastBlockIfThereIs(proposalList.forceSwitchBuf());
-//                restartTimer();
-//            }
-//        }, maxWaitingTime);
-//    }
 
     public void start(){
         server.start();

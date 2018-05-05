@@ -148,11 +148,6 @@ public class Database {
 
         System.out.println(toBeUpdated.size());
         if (toBeUpdated.size() > 0) {
-<<<<<<< Updated upstream
-            System.out.println("database: " + toBeUpdated.size());
-=======
-            System.out.println(toBeUpdated.size());
->>>>>>> Stashed changes
             server.getBroadcastOperations().sendEvent("order", new Gson().toJson(toBeUpdated));
 
             CouchDbProperties properties = new CouchDbProperties()
