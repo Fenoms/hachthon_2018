@@ -1,7 +1,9 @@
 package team_3.hackathon.backend.orderer;
 
+import java.util.Optional;
+
 public class Proposal {
-    //int version;
+    Optional<String> reply;
     int userID;
     String cmd;
 
@@ -9,6 +11,14 @@ public class Proposal {
         //this.version = version;
         this.userID = userID;
         this.cmd = cmd;
+        this.reply = Optional.ofNullable(null);
+    }
+
+    Proposal(int userID, String cmd, Optional<String> reply){
+        //this.version = version;
+        this.userID = userID;
+        this.cmd = cmd;
+        this.reply = reply;
     }
 
     public int getUserID() {
@@ -17,5 +27,9 @@ public class Proposal {
 
     public String getCmd() {
         return cmd;
+    }
+
+    public Optional<String> getReply() {
+        return reply;
     }
 }

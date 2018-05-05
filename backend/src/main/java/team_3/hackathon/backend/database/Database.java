@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.lightcouch.CouchDbClient;
 import org.lightcouch.CouchDbProperties;
+import team_3.hackathon.backend.Const;
 import team_3.hackathon.backend.orderer.Proposal;
 
 import java.lang.reflect.Type;
@@ -85,7 +86,7 @@ public class Database {
                 .setDbName("db-ticket")
                 .setCreateDbIfNotExist(true)
                 .setProtocol("http")
-                .setHost("127.0.0.1")
+                .setHost(Const.DBHostName)
                 .setPort(5984)
                 .setMaxConnections(100)
                 .setConnectionTimeout(0);
@@ -141,13 +142,14 @@ public class Database {
         cacheLock.writeLock().unlock();
 
         if (toBeUpdated.size() > 0) {
+            System.out.println("database: " + toBeUpdated.size());
             server.getBroadcastOperations().sendEvent("order", new Gson().toJson(toBeUpdated));
 
             CouchDbProperties properties = new CouchDbProperties()
                     .setDbName("db-ticket")
                     .setCreateDbIfNotExist(true)
                     .setProtocol("http")
-                    .setHost("127.0.0.1")
+                    .setHost(Const.DBHostName)
                     .setPort(5984)
                     .setMaxConnections(100)
                     .setConnectionTimeout(0);

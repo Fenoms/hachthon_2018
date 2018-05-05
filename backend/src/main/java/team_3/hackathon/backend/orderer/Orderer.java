@@ -56,6 +56,7 @@ public class Orderer {
         });
 
         server.addEventListener("db_hello", String.class, (client, data, ackSender) -> {
+            System.out.println("Database join: " + client.getSessionId());
             client.joinRoom("database");
         });
     }
@@ -72,7 +73,8 @@ public class Orderer {
             HashMap<Integer, Proposal> block =
                     proposalList.append(proposal.getInt("ticket_id"),
                             new Proposal(proposal.getInt("user_id"),
-                                    proposal.getString("cmd")));
+                                    proposal.getString("cmd"),
+                                    Optional.ofNullable(proposal.optString("reply"))));
 //            if (block != null){
 //                System.out.println("Orderor: " + block.toString());
 //                //timer.cancel();
@@ -88,7 +90,7 @@ public class Orderer {
 
     private void broadcastBlockIfThereIs(HashMap<Integer, Proposal> block){
         if (block != null) {
-            System.out.println("Orderor broadcast: " + block.size());
+            System.out.println("Orderor broadcast: "+server.getRoomOperations("database").getClients());
             server.getRoomOperations("database").sendEvent("order", new Gson().toJson(block));
         }
     }
