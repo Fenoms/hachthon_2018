@@ -77,7 +77,7 @@ public class Database {
 
         cacheLock.writeLock().lock();
         for(Map.Entry<Integer, Proposal> entry: order.entrySet()){
-            if (entry.getValue().getCmd().equals("open")){
+            if (entry.getValue().getCmd().equals("process")){
                 if (! cache.containsKey(entry.getKey())){
                     cache.put(entry.getKey(), new CacheInfo(entry.getValue().getUserID(), entry.getValue().getCmd()));
                     toBeUpdated.put(entry.getKey(), entry.getValue());
@@ -111,7 +111,7 @@ public class Database {
             int userID = proposal.getInt("user_id");
             String cmd = proposal.getString("cmd");
             boolean accept = false;
-            if (cmd.equals("open")){
+            if (cmd.equals("process")){
                 cacheLock.readLock().lock();
                 if (! cache.containsKey(ticketID)){
                     accept = true;

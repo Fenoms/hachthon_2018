@@ -66,9 +66,11 @@ public class TestCustomer {
             //client.connect();
             db.start();
             //client.emit("test", "");
-            dbClient.emit("proposal","{ticket_id: 1, user_id: 3, cmd: open}");
-            Thread.sleep(6000);
-            dbClient.emit("proposal","{ticket_id: 1, user_id: 1, cmd: open}");
+            dbClient.emit("proposal","{ticket_id: 1, user_id: 3, cmd: process}");
+            Thread.sleep(2000);
+            dbClient.emit("proposal","{ticket_id: 1, user_id: 1, cmd: process}");
+            dbClient.emit("proposal","{ticket_id: 1, user_id: 1, cmd: close}");
+            dbClient.emit("proposal","{ticket_id: 1, user_id: 3, cmd: close}");
             //client.emit("proposal","{ticket_id: 1, user_id: 3}");
             //client.emit("proposal","{ticket_id: 2, user_id: 2}");
             Thread.sleep(Integer.MAX_VALUE);
