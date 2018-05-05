@@ -58,10 +58,12 @@ public class Database {
                 System.out.println(client.getSessionId());
             });
             server.addEventListener("proposal", String.class, (client, data, ackSender) -> {
+                System.out.println(data);
                 proposalHandler(client, data);
             });
 
             server.addEventListener("hope", String.class, (client, data, ackSender) -> {
+                System.out.println(data);
                 HashMap<String, HashMap<String, String >> hope = hopeHandler(data);
                 client.sendEvent("return", hope);
 
@@ -89,7 +91,7 @@ public class Database {
                 .setDbName("db-ticket")
                 .setCreateDbIfNotExist(true)
                 .setProtocol("http")
-                .setHost(Const.DBHostName)
+                .setHost("127.0.0.1")
                 .setPort(5984)
                 .setMaxConnections(100)
                 .setConnectionTimeout(0);
@@ -109,7 +111,6 @@ public class Database {
                 tmp.put("description", json.get("t_description").toString());
                 tmp.put("status", json.get("t_status").toString());
                 tmp.put("replay", json.get("t_replay").toString());
-
 
                 hope.put(Integer.toString(i), tmp);
 
@@ -154,7 +155,7 @@ public class Database {
                     .setDbName("db-ticket")
                     .setCreateDbIfNotExist(true)
                     .setProtocol("http")
-                    .setHost(Const.DBHostName)
+                    .setHost("127.0.0.1")
                     .setPort(5984)
                     .setMaxConnections(100)
                     .setConnectionTimeout(0);
