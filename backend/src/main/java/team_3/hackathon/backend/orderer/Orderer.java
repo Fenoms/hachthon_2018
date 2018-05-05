@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,10 +20,14 @@ public class Orderer {
     private int maxWaitingTime;
     private Timer timer;
 
-    public Orderer(String hostname, int port){
+    public Orderer(String hostname,
+                   int port,
+                   Optional<Integer> maxBlockSize,
+                   Optional<Integer> numBuf,
+                   Optional<Integer> maxWaitingTime){
         //TODO add to interface
-        proposalList = new ProposalList<>(2, 2);
-        maxWaitingTime = 1000;
+        proposalList = new ProposalList<>(maxBlockSize.orElse(50), numBuf.orElse(3));
+        this.maxWaitingTime = maxWaitingTime.orElse(500);
 
         timer = new Timer();
 
@@ -39,6 +44,9 @@ public class Orderer {
 
         server.addNamespace("database");
 
+        server.addConnectListener(client->{
+            System.out.println(client.getSessionId() + "connected");
+        });
         server.addEventListener("test", String.class, (client, data, ackSender)->{
            test(client, data);
         });
@@ -59,16 +67,19 @@ public class Orderer {
 
     private void proposalHandler(SocketIOClient client, String data){
         try {
+            System.out.println("Orderer: " + data);
             JSONObject proposal = new JSONObject(data);
             HashMap<Integer, Proposal> block =
                     proposalList.append(proposal.getInt("ticket_id"),
                             new Proposal(proposal.getInt("user_id"),
                                     proposal.getString("cmd")));
-            if (block != null){
-                timer.cancel();
-                timer.purge();
-                restartTimer();
-            }
+//            if (block != null){
+//                System.out.println("Orderor: " + block.toString());
+//                //timer.cancel();
+//                broadcastBlock(block);
+//                //timer.purge();
+//                //restartTimer();
+//            }
             broadcastBlockIfThereIs(block);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -77,29 +88,34 @@ public class Orderer {
 
     private void broadcastBlockIfThereIs(HashMap<Integer, Proposal> block){
         if (block != null) {
+            System.out.println("Orderor broadcast: " + block.size());
             server.getRoomOperations("database").sendEvent("order", new Gson().toJson(block));
         }
     }
 
-    private void restartTimer(){
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                broadcastBlockIfThereIs(proposalList.forceSwitchBuf());
-                restartTimer();
-            }
-        }, maxWaitingTime);
-    }
+//    private void broadcastBlock(HashMap<Integer, Proposal> block){
+//        server.getRoomOperations("database").sendEvent("order", new Gson().toJson(block));
+//    }
+
+//    private void restartTimer(){
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                broadcastBlockIfThereIs(proposalList.forceSwitchBuf());
+//                restartTimer();
+//            }
+//        }, maxWaitingTime);
+//    }
 
     public void start(){
         server.start();
-        timer.schedule(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 broadcastBlockIfThereIs(proposalList.forceSwitchBuf());
-                restartTimer();
+                //restartTimer();
             }
-        }, maxWaitingTime);
+        }, maxWaitingTime, maxWaitingTime);
     }
 
     public void stop(){

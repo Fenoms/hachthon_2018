@@ -25,12 +25,12 @@ public class Database {
     SocketIOServer server;
     ReentrantReadWriteLock cacheLock;
 
-    public Database(){
+    public Database(String ordererURL, String hostname, int port){
         cache = new HashMap<>();
         cacheLock = new ReentrantReadWriteLock();
 
         try {
-            client = IO.socket("http://127.0.0.1:12345");
+            client = IO.socket(ordererURL);
 
             client.on("order", objects->{
                 orderHandler((String) objects[0]);
@@ -40,8 +40,8 @@ public class Database {
             //Server
 
             Configuration config = new Configuration();
-            config.setHostname("localhost");
-            config.setPort(12346);
+            config.setHostname(hostname);
+            config.setPort(port);
 
             SocketConfig socketConfig = new SocketConfig();
             socketConfig.setReuseAddress(true);

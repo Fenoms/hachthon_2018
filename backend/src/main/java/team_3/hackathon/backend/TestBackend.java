@@ -2,6 +2,9 @@ package team_3.hackathon.backend;
 
 import team_3.hackathon.backend.orderer.Orderer;
 
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class TestBackend {
     public static void main(String[] args) {
 //        Backend backend = new Backend("localhost", 12345);
@@ -36,7 +39,11 @@ public class TestBackend {
 //
 //        server.start();
 
-        Orderer orderer = new Orderer("localhost", 12345);
+        Orderer orderer = new Orderer(Const.hostname,
+                Const.OrdererPort,
+                Optional.ofNullable(2),
+                Optional.ofNullable(null),
+                Optional.ofNullable(null));
 
         orderer.start();
 
