@@ -1,0 +1,92 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>2018 Hackathon - challenge 1</title>
+  <meta name="description" content="the project for rwth hackathon - challenge 1 - tickets system">
+  <meta name="author" content="Team 3">
+
+  <link rel="stylesheet" href="../css/index.css">
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container">
+      <div class="tickets">
+        <h2>Tickets</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>UserId</th>
+              <th>Message</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ticketsrows">
+            <tr id="ticket-1">
+              <td>1</td>
+              <td>2018-05-03</td>
+              <td>23:20</td>
+              <td>3292</td>
+              <td>"My car brock down in a week!!!"</td>
+              <td><span class="badge badge-success">Success</span></td>
+              <td style = "display:none" >fewewdddddddddd</td>
+            </tr>
+            <tr id="ticket-2">
+              <td>2</td>
+              <td>2018-05-03</td>
+              <td>23:20</td>
+              <td>0392</td>
+              <td>"My car brock down in a week!!!"</td>
+              <td><span class="badge badge-success">Success</span></td>
+              <td style = "display:none" >fewewdddddddddd</td>
+            </tr>
+            <tr id="ticket-3">
+              <td>3</td>
+              <td>2018-05-03</td>
+              <td>23:20</td>
+              <td>1232</td>
+              <td>"My car brock down in a week!!!"</td>
+              <td><span class="badge badge-success">Success</span></td>
+              <td style = "display:none" >wzssssssssssss</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Ticket Editor</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div id="ticket-detail"></div>
+              <div id="editor"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button id="modified" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <script src="../js/jquery-3.3.1.min.js"></script>
+  <!-- <script src="../js/bootstrap-wysiwyg.js" defer></script> -->
+  <script src="../js/index.js"></script>
+  <script src="../js/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>
