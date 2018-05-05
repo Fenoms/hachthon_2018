@@ -2,11 +2,10 @@ package team_3.hackathon.backend;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import team_3.hackathon.backend.database.Database;
 
 import java.net.URISyntaxException;
 
-public class TestCustomer {
+public class StartTestFrontEnd {
     public static void main(String[] args) {
         try {
             Socket dbClient = IO.socket(Const.DBURL);
@@ -25,10 +24,8 @@ public class TestCustomer {
             odererClient.connect();
             dbClient.connect();
 
-            Database db = new Database(Const.OrdererURL, Const.hostname, Const.DBPort);
-
             //client.connect();
-            db.start();
+
             //client.emit("test", "");
             dbClient.emit("proposal","{ticket_id: 1, user_id: 3, cmd: process}");
             dbClient.emit("proposal","{ticket_id: 2, user_id: 3, cmd: process}");
@@ -41,7 +38,6 @@ public class TestCustomer {
             Thread.sleep(Integer.MAX_VALUE);
             dbClient.disconnect();
             odererClient.disconnect();
-            db.stop();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
